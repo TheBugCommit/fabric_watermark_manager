@@ -1,4 +1,4 @@
-TABLE_NAME = "Watermark_Control"
+﻿TABLE_NAME = "Watermark_Control"
 
 # ── Load Modes ──
 MODE_INCREMENTAL = "INCREMENTAL"

@@ -1,4 +1,6 @@
-from contextlib import contextmanager
+﻿from contextlib import contextmanager
+from datetime import datetime
+
 from . import _constants as c
 from ._query import WatermarkQuery
 from ._admin import _esc
@@ -10,7 +12,6 @@ def _to_iso(value) -> str:
     if hasattr(value, 'strftime'):
         return value.strftime("%Y-%m-%d %H:%M:%S")
     return str(value)
-
 
 def _write_state(spark, source: str, table: str,
                  watermark, ok: bool, error: str,

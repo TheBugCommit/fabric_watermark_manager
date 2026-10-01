@@ -1,5 +1,6 @@
-import json
+﻿import json
 from datetime import datetime, timedelta
+
 from . import _constants as c
 
 
@@ -22,12 +23,13 @@ class WatermarkConfig:
     """
 
     def __init__(self, row):
-        self._row = row
+        # Convert Spark Row to dict so .get() works (Row does not support .get())
+        self._row = row.asDict() if hasattr(row, "asDict") else dict(row)
         # Cache expensive/repeated derivations at construction time.
         self._effective_mode: str = self._resolve_effective_mode()
-        self._watermark_last = row[c.COL_WATERMARK_LAST]
+        self._watermark_last = self._row.get(c.COL_WATERMARK_LAST)
         
-        pk = row.get(c.COL_PK_COLUMNS)
+        pk = self._row.get(c.COL_PK_COLUMNS)
         self._pk_columns: list = json.loads(pk) if pk else []
         
         self._from_date: datetime = self._resolve_from_date()
@@ -84,6 +86,18 @@ class WatermarkConfig:
     @property
     def watermark_last(self) -> datetime:
         return self._watermark_last
+
+    @property
+    def last_run_at(self) -> datetime:
+        return self._row.get(c.COL_LAST_RUN_AT)
+
+    @property
+    def last_run_ok(self) -> bool:
+        return self._row.get(c.COL_LAST_RUN_OK)
+
+    @property
+    def last_error(self) -> str:
+        return self._row.get(c.COL_LAST_ERROR)
 
     # ── Source & Windows ─────────────────────────────────────
     @property
@@ -161,7 +175,12 @@ class WatermarkConfig:
 
         # INCREMENTAL mode: wrap in a subquery and filter by date
         cutoff_str = self._from_date.strftime(self.source_datecol_format)
-        return f"SELECT * FROM ({base_query}) _wm WHERE _wm.{self.source_datecol} >= '{cutoff_str}'"
+        base_query = base_query.strip().rstrip(";")
+        
+        if " WHERE " in base_query.upper():
+            return f"{base_query} AND {self.source_datecol} >= {cutoff_str}"
+        else:
+            return f"{base_query} WHERE {self.source_datecol} >= {cutoff_str}"
 
     @property
     def should_run(self) -> bool:
