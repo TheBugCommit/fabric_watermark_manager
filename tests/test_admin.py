@@ -132,7 +132,7 @@ try:
         """1.5 Inserció amb overwrite=True, provant àlies table_name i camp extra."""
         admin.insert_table(
             source=TEST_SOURCE,
-            table_name=TEST_TABLE,  # Provant l'àlies table_name
+            table=TEST_TABLE,
             area=TEST_AREA,
             silver_table="silver.test_table_dev_v2",
             bronze_path="Files/bronze/test_table_dev",
@@ -281,7 +281,7 @@ try:
     def test_delete_missing_args():
         """3.2 Rebuig de delete_table sense paràmetres obligatoris."""
         try:
-            admin.delete_table(source=None, table_name=None)
+            admin.delete_table(source=None, table=None)
             raise AssertionError("Hauria d'haver fallat per arguments buits!")
         except ValueError as e:
             assert "required" in str(e).lower()

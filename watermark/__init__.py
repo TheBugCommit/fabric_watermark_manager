@@ -11,7 +11,7 @@ from . import _schema as schema
 sys.modules[f"{__name__}.constants"] = constants
 sys.modules[f"{__name__}.schema"] = schema
 
-__version__ = "1.0.0"
+__version__ = "1.0.6"
 __all__ = [
     "WatermarkConfig",
     "WatermarkQuery",

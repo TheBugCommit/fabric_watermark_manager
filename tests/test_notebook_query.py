@@ -20,7 +20,7 @@
 # ==============================================================================
 
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 
 if hasattr(sys.stdout, "reconfigure"):
     try:
@@ -28,10 +28,7 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-try:
-    import watermark as wm
-except ImportError:
-    import watermark as wm
+import watermark as wm
 
 try:
     _ = spark
