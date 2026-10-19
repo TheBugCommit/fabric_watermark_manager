@@ -1,7 +1,7 @@
 # ==============================================================================
 # 🧪 TEST SUITE DE WatermarkAdmin: insert_table, update_table, delete_table
 # ==============================================================================
-import watermark as wm
+import bfg_watermark as wm
 # Si estàs provant el paquet genèric pots fer: import watermark as wm
 
 admin = wm.WatermarkAdmin(spark)

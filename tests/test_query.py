@@ -8,13 +8,13 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from watermark._query import WatermarkQuery
-    from watermark._config import WatermarkConfig
-    from watermark import _constants as c
+    from bfg_watermark._query import WatermarkQuery
+    from bfg_watermark._config import WatermarkConfig
+    from bfg_watermark import _constants as c
 except ImportError:
-    from watermark._query import WatermarkQuery
-    from watermark._config import WatermarkConfig
-    from watermark import _constants as c
+    from bfg_watermark._query import WatermarkQuery
+    from bfg_watermark._config import WatermarkConfig
+    from bfg_watermark import _constants as c
 
 
 class MockDataFrame:

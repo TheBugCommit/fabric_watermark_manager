@@ -28,7 +28,7 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-import watermark as wm
+import bfg_watermark as wm
 
 try:
     _ = spark

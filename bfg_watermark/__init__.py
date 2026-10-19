@@ -7,7 +7,7 @@ from ._session  import watermark_session
 from . import _constants as constants
 from . import _schema as schema
 
-# Register submodules so `from watermark.constants import ...` and `from watermark.schema import ...` also work
+# Register submodules so `from bfg_watermark.constants import ...` and `from watermark.schema import ...` also work
 sys.modules[f"{__name__}.constants"] = constants
 sys.modules[f"{__name__}.schema"] = schema
 

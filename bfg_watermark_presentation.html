@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>watermark — Documentació Completa</title>
+    <title>bfg_watermark — Documentació Completa</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -646,7 +646,7 @@
 <body>
     <div id="progress-bar"></div>
     <nav>
-        <div class="nav-brand">watermark v1.0</div>
+        <div class="nav-brand">bfg_watermark v1.0</div>
         <div class="nav-links">
             <a href="#hero">Inici</a>
             <a href="#concepte">Concepte</a>
@@ -661,7 +661,7 @@
     <!-- HERO -->
     <section id="hero">
         <div class="hero-badge">&#128204; MS Fabric &middot; PySpark &middot; Delta Lake</div>
-        <h1 class="hero-title">watermark<br>Documentació Completa</h1>
+        <h1 class="hero-title">bfg_watermark<br>Documentació Completa</h1>
         <p class="hero-sub">La llibreria Python que gestiona la <strong>càrrega incremental de dades</strong> a
             Microsoft Fabric. Controla automàticament quin rang de dates extreure, detecta errors, i actualitza l'estat
             de cada taula en un sol MERGE atòmic.</p>
@@ -786,10 +786,8 @@
                         <td><code>'SELECT ... FROM porder'</code></td>
                         <td>Query SQL completa <em>sense filtre de dates</em>. <code>cfg.build_source_query()</code> hi
                             afegeix automàticament el filtre
-                            <code>WHERE &lt;datecol&gt; &gt;= '&lt;from_date&gt;'</code> i una clàusula
-                            <code>EXISTS</code> de control si el mode és incremental.
-                            Això evita extreure dades innecessàriament. <code>NULL</code> = el notebook gestiona la
-                            query manualment.
+                            <code>WHERE &lt;datecol&gt; &gt;= '&lt;from_date&gt;'</code> i una clàusula <code>EXISTS</code> de control si el mode és incremental.
+                            Això evita extreure dades innecessàriament. <code>NULL</code> = el notebook gestiona la query manualment.
                         </td>
                     </tr>
                     <tr>
@@ -1364,9 +1362,7 @@
                     <tr>
                         <td><code>.build_source_query()</code></td>
                         <td>str|None</td>
-                        <td>Retorna el SQL complet amb el filtre de dates i una clàusula <code>EXISTS</code> ja afegits
-                            si és incremental, permetent a la base de dades retornar 0 registres instantàniament si no
-                            hi ha novetats. <code>None</code>
+                        <td>Retorna el SQL complet amb el filtre de dates i una clàusula <code>EXISTS</code> ja afegits si és incremental, permetent a la base de dades retornar 0 registres instantàniament si no hi ha novetats. <code>None</code>
                             si <code>SOURCE_QUERY</code> no està configurat a la WT.</td>
                     </tr>
                     <tr>

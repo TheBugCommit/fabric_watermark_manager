@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="watermark",
+    name="bfg_watermark",
     version="1.0.6",
     description="Watermark control library for Microsoft Fabric",
     packages=find_packages(),
