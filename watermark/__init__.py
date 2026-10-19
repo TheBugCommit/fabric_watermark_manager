@@ -1,9 +1,15 @@
+import sys
 from ._config   import WatermarkConfig
 from ._query    import WatermarkQuery
 from ._admin    import WatermarkAdmin
 from ._session  import watermark_session
 
-from ._constants import MODE_INCREMENTAL, MODE_FULL_RELOAD, MODE_SKIP
+from . import _constants as constants
+from . import _schema as schema
+
+# Register submodules so `from watermark.constants import ...` and `from watermark.schema import ...` also work
+sys.modules[f"{__name__}.constants"] = constants
+sys.modules[f"{__name__}.schema"] = schema
 
 __version__ = "1.0.0"
 __all__ = [
@@ -11,7 +17,6 @@ __all__ = [
     "WatermarkQuery",
     "WatermarkAdmin",
     "watermark_session",
-    "MODE_INCREMENTAL",
-    "MODE_FULL_RELOAD",
-    "MODE_SKIP",
+    "constants",
+    "schema",
 ]

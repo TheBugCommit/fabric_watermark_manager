@@ -1,4 +1,4 @@
-﻿import json
+import json
 from datetime import datetime, timedelta
 
 from . import _constants as c
@@ -164,6 +164,8 @@ class WatermarkConfig:
         - If FULL_RELOAD or no watermark: returns SOURCE_QUERY unchanged.
         - If INCREMENTAL: wraps SOURCE_QUERY to add a WHERE filter on
           SOURCE_DATECOL using the computed from_date (watermark - window_days).
+          It also adds an EXISTS clause to avoid extracting any data if there
+          are no records strictly newer than the last watermark.
         """
         base_query = self.source_query
         if not base_query:
@@ -173,14 +175,18 @@ class WatermarkConfig:
         if self.effective_mode != c.MODE_INCREMENTAL or not self.source_datecol or self._from_date is None:
             return base_query
 
-        # INCREMENTAL mode: wrap in a subquery and filter by date
+        # INCREMENTAL mode: filter by date and ensure there is newer data
         cutoff_str = self._from_date.strftime(self.source_datecol_format)
+        watermark_str = self._watermark_last.strftime(self.source_datecol_format)
+        
+        exists_clause = f"EXISTS (SELECT 1 FROM {self.table_name} WHERE {self.source_datecol} > {watermark_str})"
+        
         base_query = base_query.strip().rstrip(";")
         
         if " WHERE " in base_query.upper():
-            return f"{base_query} AND {self.source_datecol} >= {cutoff_str}"
+            return f"{base_query} AND {self.source_datecol} >= {cutoff_str} AND {exists_clause}"
         else:
-            return f"{base_query} WHERE {self.source_datecol} >= {cutoff_str}"
+            return f"{base_query} WHERE {self.source_datecol} >= {cutoff_str} AND {exists_clause}"
 
     @property
     def should_run(self) -> bool:
@@ -198,6 +204,26 @@ class WatermarkConfig:
         If not called, defaults to the current execution time.
         """
         self._new_watermark = new_watermark
+
+    def get(self, key: str, default=None):
+        """Returns the value of any column (standard or custom) from the row."""
+        if key in self._row:
+            return self._row[key]
+        for k, v in self._row.items():
+            if k.upper() == key.upper():
+                return v
+        return default
+
+    def to_dict(self) -> dict:
+        """Returns a copy of the underlying row dictionary."""
+        return dict(self._row)
+
+    def __getattr__(self, name: str):
+        if "_row" in self.__dict__:
+            upper_map = {k.upper(): v for k, v in self._row.items()}
+            if name.upper() in upper_map:
+                return upper_map[name.upper()]
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
     def __repr__(self):
         return (

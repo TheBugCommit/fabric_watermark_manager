@@ -46,7 +46,7 @@ La llibreria s'exposa de forma neta a través de l'`__init__.py`. Les eines prin
 ### A. `WatermarkQuery` (Cerca i llistat de taules)
 S'utilitza per consultar l'estat actual i decidir quines taules han de processar-se avui. Permet generar el JSON per passar al pipeline de Data Factory.
 ```python
-import _watermark as wm
+import watermark as wm
 
 # Obtenir només les taules actives i configurades de ORACLE i SAP
 configs = wm.WatermarkQuery().source("ORACLE", "SAP").runnable().build()
@@ -58,15 +58,32 @@ for cfg in configs:
 ### B. `WatermarkAdmin` (Manteniment)
 S'utilitza des de Notebooks d'administració per forçar comportaments en la següent execució sense haver de tocar codi SQL.
 ```python
-import _watermark as wm
+import watermark as wm
 
-admin = wm.WatermarkAdmin()
+admin = wm.WatermarkAdmin(spark)
+
+# Inserir una nova taula a la taula de control (validada automàticament contra l'esquema)
+admin.insert_table(
+    source="ORACLE",
+    table="PORDER",
+    area="COMPRES",
+    silver_table="silver.compres_porder",
+    bronze_path="Files/bronze/oracle/porder",
+    source_query="SELECT * FROM ORACLE.PORDER",
+    source_datecol="UPDATED_AT",
+    window_days=2,
+    pk_columns=["PO_NUMBER", "LINE_ID"],
+    load_mode=wm.constants.MODE_INCREMENTAL,
+)
 
 # Activar una àrea sencera
 admin.activate(area="COMPRES")
 
 # Configurar el mode de càrrega d'una àrea
-admin.set_mode(wm.MODE_INCREMENTAL, area="COMPRES")
+admin.set_mode(wm.constants.MODE_INCREMENTAL, area="COMPRES")
+
+# Actualitzar columnes específiques amb validació
+admin.update_table(source="ORACLE", table="PORDER", window_days=5, active=True)
 
 # Forçar càrrega completa per a una taula d'Oracle en el següent run
 admin.force_full_reload(source="ORACLE", table="PORDER")
@@ -179,19 +196,39 @@ for cfg in taules:
 
 ## 4. Referència Completa de Mètodes
 
-Tots els exemples assumeixen `import _watermark as wm`.
+Tots els exemples assumeixen `import watermark as wm`.
 
-### `wm.WatermarkAdmin()`
+### `wm.WatermarkAdmin(spark)`
 *Classe per l'administració de la taula de control.*
-- `activate(source, area, table)`: Posa `ACTIVE=True`. (ex: `admin.activate(area="COMPRES")`)
+- `insert_table(source, table, area, silver_table, bronze_path, source_query, source_datecol, pk_columns, ...)`: Insereix o dóna d'alta una nova taula a `Watermark_Control`. Valida automàticament camps requerits, tipus i valors permesos contra `wm.schema.CONTROL_TABLE_SCHEMA`. Admet `table_name` com a àlies de `table`, `window_days`, `active`, `run_order`, `load_mode`, `overwrite=True` (per sobreescriure si ja existeix) i columnes addicionals via `**extra_fields`.
+- `update_table(source=..., area=..., table=..., updates={...}, **kwargs)`: Actualitza columnes específiques amb validació estricta d'esquema (rebutja nulls en requerits, valida tipus, bloqueja modificació de `CREATED_AT` / `UPDATED_AT`).
+- `delete_table(source, table_name)`: Elimina el registre d'una taula de la taula de control.
+- `activate(source, area, table)`: Posa `ACTIVE=True`. (ex: `admin.activate(area="COMPRES")`).
 - `deactivate(source, area, table)`: Posa `ACTIVE=False`. Les taules no s'executaran.
-- `set_mode(mode, source, area, table)`: Canvia el comportament per defecte permanentment (`wm.MODE_INCREMENTAL`, `wm.MODE_FULL_RELOAD`, `wm.MODE_SKIP`).
+- `set_mode(mode, source, area, table)`: Canvia el comportament per defecte permanentment (`wm.constants.MODE_INCREMENTAL`, `wm.constants.MODE_FULL_RELOAD`, `wm.constants.MODE_SKIP`).
 - `force_full_reload(source, area, table)`: Força que la següent execució sigui un `FULL_RELOAD`. (Només aplica 1 vegada).
 - `skip_next_run(source, area, table)`: Força que la següent execució se salti i no faci res. (Només aplica 1 vegada).
 - `resume_from_skip(source, area, table)`: Torna l'estat normal a taules que havien estat marcades per ser saltades manualment.
-- `reset_watermark(source, area, table)`: Neteja la data del watermark, provocant un Full Reload inevitable la propera vegada.
-- `failed()`: Retorna un DataFrame de Spark amb les taules que van fallar en la seva última execució.
+- `reset_watermark(source, area, table)`: Neteja la data del watermark (`WATERMARK_LAST_VALUE = NULL`), provocant un Full Reload automàtic la propera vegada.
+- `status()`: Retorna un DataFrame de Spark amb la visió global de totes les taules.
+- `errors()`: Retorna un DataFrame de Spark amb les taules que van fallar en la seva última execució.
 - `stale(hours=25)`: Retorna un DataFrame amb les taules que porten més temps sense executar-se del compte (útil per alertes).
+- `show_history(limit=20)`: Mostra l'historial de canvis de Delta Lake de la taula de control.
+- `inspect_table(version=..., timestamp=...)`: Consulta una versió anterior de la taula de control mitjançant Delta Time Travel.
+- `recover_table(version=..., timestamp=...)`: Restaura la taula de control a una versió o data anterior (`RESTORE TABLE`).
+
+### `wm.constants` (Constants del Sistema)
+- `wm.constants.MODE_INCREMENTAL`: `"INCREMENTAL"`
+- `wm.constants.MODE_FULL_RELOAD`: `"FULL_RELOAD"`
+- `wm.constants.MODE_SKIP`: `"SKIP"`
+- `wm.constants.VALID_MODES`: `("INCREMENTAL", "FULL_RELOAD", "SKIP")`
+- Noms físics de columnes: `wm.constants.COL_SOURCE`, `wm.constants.COL_TABLE_NAME`, `wm.constants.COL_AREA`, `wm.constants.COL_ACTIVE`, etc.
+
+### `wm.schema` (Diccionari de Dades i Validació)
+- `wm.schema.CONTROL_TABLE_SCHEMA`: Diccionari amb la definició mestre de totes les columnes (tipus, requerits, valors per defecte, valors permesos).
+- `wm.schema.validate_column_value(col, val)`: Normalitza el nom i valida el valor d'una columna.
+- `wm.schema.validate_record(inputs)`: Valida un registre sencer, injecta defaults de l'esquema i admet `extra_fields`.
+- `wm.schema.get_column_name(name)`: Retorna el nom físic de la columna a la taula Delta.
 
 ### `wm.WatermarkQuery()`
 *Builder per filtrar i obtenir configuracions.*
@@ -208,7 +245,7 @@ Tots els exemples assumeixen `import _watermark as wm`.
 - `effective_mode`: L'estratègia resolta actual ('FULL_RELOAD', 'INCREMENTAL', 'SKIP').
 - `from_date`: La data límit per l'extracció, amb els `window_days` ja restats. És `None` si és mode full.
 - `is_first_run`: Booleà que indica si és la primera vegada que es carrega la taula.
-- `build_source_query(date_format)`: Construeix i retorna la Query SQL (p.ex per passar a Data Factory) injectant-hi el filtre de data necessari. Pots forçar el format de la data amb el paràmetre opcional `date_format`.
+- `build_source_query()`: Construeix i retorna la Query SQL (p.ex per passar a Data Factory o ODBC/JDBC) injectant-hi el filtre de data necessari (`>= from_date`) i una clàusula `EXISTS (SELECT 1 FROM <table> WHERE <datecol> > <watermark_last>)` per evitar extreure dades innecessàries si no hi ha registres més nous que el darrer watermark.
 - `set_new_watermark(date_value)`: Mètode per sobreescriure la data que es guardarà quan el procés acabi amb èxit.
 
 ### `wm.watermark_session(config=cfg, source=..., table=...)`

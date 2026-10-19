@@ -1,3 +1,10 @@
+# watermark/_query.py
+# ─────────────────────────────────────────────────────────────
+# WatermarkQuery: fluent builder for querying Watermark_Control.
+# All filter methods return self for chaining.
+# Call .build() to get a list or .one() to get a single config.
+# ─────────────────────────────────────────────────────────────
+
 from . import _constants as c
 from ._config import WatermarkConfig
 
@@ -75,6 +82,25 @@ class WatermarkQuery:
         """Filter by permanent LOAD_MODE."""
         s = ", ".join(f"'{v}'" for v in modes)
         self._filters.append(f"{c.COL_LOAD_MODE} IN ({s})")
+        return self
+
+    def where(self, **kwargs):
+        """
+        Generic filter for any column, known or custom.
+        Example: query.where(silver_table="silver.orders", active=True)
+        """
+        from ._schema import get_column_name
+        for col_param, val in kwargs.items():
+            col_name = get_column_name(col_param)
+            if val is None:
+                self._filters.append(f"{col_name} IS NULL")
+            elif isinstance(val, bool):
+                self._filters.append(f"{col_name} = {'true' if val else 'false'}")
+            elif isinstance(val, (int, float)):
+                self._filters.append(f"{col_name} = {val}")
+            else:
+                escaped = str(val).replace("'", "''")
+                self._filters.append(f"{col_name} = '{escaped}'")
         return self
 
     def ordered(self):

@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>watermark — Documentació Completa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-d: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --bg: #0f0f1a;
+            --bg2: #161625;
+            --bg3: #1e1e32;
+            --border: rgba(99, 102, 241, .18);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --code-bg: #0d1117;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            z-index: 1000;
+            transition: width .1s;
+        }
+
+        nav {
+            position: fixed;
+            top: 3px;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 26, .92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+            z-index: 999;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: .15rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: .75rem;
+            font-weight: 500;
+            padding: .35rem .65rem;
+            border-radius: 6px;
+            transition: all .2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text);
+            background: rgba(99, 102, 241, .15);
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 7rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .6s ease, transform .6s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: rgba(99, 102, 241, .12);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            padding: .4rem 1rem;
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-sub {
+            font-size: 1.15rem;
+            color: var(--muted);
+            max-width: 640px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-pills {
+            display: flex;
+            gap: .75rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .45rem 1rem;
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .pill span {
+            color: var(--primary);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 2.5rem;
+            font-size: 1rem;
+        }
+
+        .concept-flow {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            align-items: center;
+            gap: .5rem;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .flow-node {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .flow-node .icon {
+            font-size: 1.8rem;
+            margin-bottom: .4rem;
+        }
+
+        .flow-node .label {
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .flow-node .desc {
+            color: var(--muted);
+            font-size: .75rem;
+            margin-top: .3rem;
+        }
+
+        .flow-arrow {
+            color: var(--primary);
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .callout {
+            background: rgba(99, 102, 241, .08);
+            border-left: 3px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout.success {
+            border-color: var(--secondary);
+            background: rgba(16, 185, 129, .08);
+        }
+
+        .callout.warning {
+            border-color: var(--accent);
+            background: rgba(245, 158, 11, .08);
+        }
+
+        .callout strong {
+            display: block;
+            margin-bottom: .3rem;
+            font-weight: 600;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .88rem;
+        }
+
+        thead {
+            background: var(--bg3);
+        }
+
+        th {
+            padding: .85rem 1rem;
+            text-align: left;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: .8rem 1rem;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(99, 102, 241, .04);
+        }
+
+        td code,
+        th code {
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            border-radius: 4px;
+            padding: .1rem .4rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82em;
+        }
+
+        .group-header {
+            background: linear-gradient(90deg, rgba(99, 102, 241, .12), transparent);
+            border-left: 3px solid var(--primary);
+        }
+
+        .group-header td {
+            font-weight: 700;
+            font-size: .82rem;
+            color: var(--primary);
+            padding: .6rem 1rem;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .arch-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .arch-step {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-d));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .9rem;
+            color: #fff;
+        }
+
+        .arch-content {
+            flex: 1;
+        }
+
+        .arch-content strong {
+            display: block;
+            margin-bottom: .2rem;
+            font-size: .95rem;
+        }
+
+        .arch-content p {
+            color: var(--muted);
+            font-size: .87rem;
+            margin: 0;
+        }
+
+        .arch-connector {
+            margin-left: 18px;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        @media(max-width:900px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .concept-flow {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.4rem;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            margin-bottom: .8rem;
+            font-weight: 600;
+        }
+
+        .card p,
+        .card li {
+            color: var(--muted);
+            font-size: .87rem;
+        }
+
+        .card code {
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            border-radius: 4px;
+            padding: .1rem .35rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8em;
+        }
+
+        .priority-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .priority-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .7rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .priority-step:last-child {
+            border-bottom: none;
+        }
+
+        .priority-num {
+            min-width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .8rem;
+        }
+
+        .priority-step p {
+            margin: 0;
+            font-size: .9rem;
+        }
+
+        .priority-step p span {
+            color: var(--muted);
+            font-size: .83rem;
+            display: block;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .85rem;
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        .keyword {
+            color: #ff7b72;
+        }
+
+        .function {
+            color: #d2a8ff;
+        }
+
+        .string {
+            color: #a5d6ff;
+        }
+
+        .comment {
+            color: #6e7681;
+            font-style: italic;
+        }
+
+        .guarantee-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media(max-width:700px) {
+            .guarantee-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .g-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.3rem;
+            text-align: center;
+        }
+
+        .g-card .icon {
+            font-size: 2rem;
+            margin-bottom: .6rem;
+        }
+
+        .g-card h4 {
+            font-size: .9rem;
+            margin-bottom: .6rem;
+        }
+
+        .g-card p {
+            color: var(--muted);
+            font-size: .82rem;
+            line-height: 1.5;
+        }
+
+        .g-card code {
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            border-radius: 4px;
+            padding: .05rem .3rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78em;
+        }
+
+        .ops-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.4rem;
+            margin-bottom: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .ops-card.green {
+            border-left-color: var(--secondary);
+        }
+
+        .ops-card.amber {
+            border-left-color: var(--accent);
+        }
+
+        .ops-card.purple {
+            border-left-color: var(--purple);
+        }
+
+        .ops-card h3 {
+            font-size: 1rem;
+            margin-bottom: .8rem;
+            font-weight: 600;
+        }
+
+        .ops-card ol,
+        .ops-card ul {
+            padding-left: 1.3rem;
+            display: flex;
+            flex-direction: column;
+            gap: .45rem;
+        }
+
+        .ops-card li {
+            color: var(--muted);
+            font-size: .87rem;
+        }
+
+        .ops-card li b {
+            color: var(--text);
+        }
+
+        .ops-card code {
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            border-radius: 4px;
+            padding: .1rem .35rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8em;
+        }
+
+        .ops-card p {
+            color: var(--muted);
+            font-size: .87rem;
+            margin-bottom: .8rem;
+        }
+
+        h3.sub {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        h3.sub::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .td-muted {
+            background: var(--bg3);
+            color: var(--muted);
+            font-size: .78rem;
+            padding: .5rem 1rem;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            color: var(--muted);
+            font-size: .82rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="progress-bar"></div>
+    <nav>
+        <div class="nav-brand">watermark v1.0</div>
+        <div class="nav-links">
+            <a href="#hero">Inici</a>
+            <a href="#concepte">Concepte</a>
+            <a href="#taula">Taula WT</a>
+            <a href="#arquitectura">Arquitectura</a>
+            <a href="#operacions">Operacions</a>
+            <a href="#escenaris">Escenaris</a>
+            <a href="#api">API</a>
+            <a href="#codi">Codi</a>
+        </div>
+    </nav>
+    <!-- HERO -->
+    <section id="hero">
+        <div class="hero-badge">&#128204; MS Fabric &middot; PySpark &middot; Delta Lake</div>
+        <h1 class="hero-title">watermark<br>Documentació Completa</h1>
+        <p class="hero-sub">La llibreria Python que gestiona la <strong>càrrega incremental de dades</strong> a
+            Microsoft Fabric. Controla automàticament quin rang de dates extreure, detecta errors, i actualitza l'estat
+            de cada taula en un sol MERGE atòmic.</p>
+        <div class="hero-pills">
+            <div class="pill"><span>&#128203;</span> Taula: <code>Watermark_Control</code></div>
+            <div class="pill"><span>&#128218;</span> Lakehouse: <code>LH_BRONCE_PLATA</code></div>
+            <div class="pill"><span>&#128275;</span> Versió: <code>1.0.4</code></div>
+            <div class="pill"><span>&#128640;</span> 4 mòduls: Query &middot; Config &middot; Session &middot; Admin
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPTE -->
+    <section id="concepte">
+        <h2 class="section-title">Concepte: Què és un Watermark?</h2>
+        <div class="callout">
+            <strong>La idea clau</strong>
+            Cada nit guardem la data de l'últim registre processat. La nit següent, <em>només demanem els registres més
+                nous que aquella data</em>.
+        </div>
+        <div class="grid-3">
+            <div class="card">
+                <h3>&#128200; Primera vegada (FULL_RELOAD)</h3>
+                <p>Descarrega <strong>tota</strong> la taula de l'origen. La <code>Watermark_Control</code> ho detecta
+                    automàticament quan <code>WATERMARK_LAST_VALUE</code> és <code>NULL</code>.</p>
+            </div>
+            <div class="card">
+                <h3>&#9889; Nits següents (INCREMENTAL)</h3>
+                <p>Descarrega <strong>només els registres nous o modificats</strong> des del darrer watermark, menys la
+                    finestra de seguretat (<code>WINDOW_DAYS</code>) per evitar buits.</p>
+            </div>
+            <div class="card">
+                <h3>&#129504; La WT és el cervell</h3>
+                <p>Ens ajuda a <strong>centralitzar les càrregues</strong> de les taules en el sistema i
+                    <strong>gestionar-les fàcilment</strong>. Tots els paràmetres viuen a la
+                    <code>Watermark_Control</code>. A més a més, és molt útil ja que ens permet <strong>automatitzar el
+                        Data Quality</strong>. Els Notebooks no contenen
+                    <em>hardcoded logic</em>: simplement pregunten "com t'he de tractar?" i actuen.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAULA WT -->
+    <section id="taula">
+        <h2 class="section-title">La Taula <code>Watermark_Control</code></h2>
+        <p class="subtitle">20 columnes organitzades en 5 grups funcionals. Clau primària:
+            <code>SOURCE + TABLE_NAME</code>.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Columna</th>
+                        <th>Tipus</th>
+                        <th>Exemple</th>
+                        <th>Descripció</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="group-header">
+                        <td colspan="4">&#128100; A &mdash; IDENTITAT</td>
+                    </tr>
+                    <tr>
+                        <td><code>SOURCE</code></td>
+                        <td>STRING</td>
+                        <td><code>'SAGE'</code></td>
+                        <td>Identificador del sistema d'origen (ex: <code>'SAGE'</code>, <code>'ORACLE'</code>,
+                            <code>'MSSQL'</code>). Agrupa totes les taules d'un mateix sistema i és el filtre principal
+                            als Pipelines i a <code>WatermarkQuery.source(...)</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>TABLE_NAME</code></td>
+                        <td>STRING</td>
+                        <td><code>'PORDER'</code></td>
+                        <td>Nom exacte de la taula a l'origen. <strong>No és el nom a Plata</strong>, sinó el nom de
+                            l'objecte a la base de dades font. Juntament amb <code>SOURCE</code> forma la clau primària
+                            de la WT.</td>
+                    </tr>
+                    <tr>
+                        <td><code>AREA</code></td>
+                        <td>STRING</td>
+                        <td><code>'COMPRES'</code></td>
+                        <td>Àrea de negoci (ex: <code>'COMPRES'</code>, <code>'VENDES'</code>, <code>'STOCKS'</code>).
+                            Permet activar/desactivar o saltar grups sencers de taules amb una sola instrucció d'Admin.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>IS_DIMENSION</code></td>
+                        <td>BOOLEAN</td>
+                        <td><code>false</code></td>
+                        <td>Indica si és una dimensió (<code>true</code>) o una taula de fets (<code>false</code>). Les
+                            dimensions acostumen a carregar-se senceres cada vegada (<code>FULL_RELOAD</code>).</td>
+                    </tr>
+                    <tr class="group-header">
+                        <td colspan="4">&#128270; B &mdash; ENRUTAMENT</td>
+                    </tr>
+                    <tr>
+                        <td><code>SILVER_TABLE</code></td>
+                        <td>STRING</td>
+                        <td><code>'silver_sage_compres_porder'</code></td>
+                        <td>Nom complet de la taula Delta destí a la capa Plata. El Notebook hi escriu el resultat
+                            final. S'usa amb <code>DeltaTable.forName(spark, cfg.silver_table)</code> o
+                            <code>saveAsTable()</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>BRONZE_PATH</code></td>
+                        <td>STRING</td>
+                        <td><code>'file:/lakehouse/default/Files/Bronze/Sage/Compras/PORDER.parquet'</code></td>
+                        <td>Ruta relativa on el Pipeline guarda el <code>.parquet</code>. El Notebook Bronze&rarr;Plata
+                            llegeix exactament d'aquí. Ha de coincidir amb la ruta configurada al <em>Copy Data</em>.
+                        </td>
+                    </tr>
+                    <tr class="group-header">
+                        <td colspan="4">&#128296; C &mdash; EXTRACCIÓ I MERGE</td>
+                    </tr>
+                    <tr>
+                        <td><code>SOURCE_QUERY</code></td>
+                        <td>STRING</td>
+                        <td><code>'SELECT ... FROM porder'</code></td>
+                        <td>Query SQL completa <em>sense filtre de dates</em>. <code>cfg.build_source_query()</code> hi
+                            afegeix automàticament el filtre
+                            <code>WHERE &lt;datecol&gt; &gt;= '&lt;from_date&gt;'</code> i una clàusula
+                            <code>EXISTS</code> de control si el mode és incremental.
+                            Això evita extreure dades innecessàriament. <code>NULL</code> = el notebook gestiona la
+                            query manualment.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>SOURCE_DATECOL</code></td>
+                        <td>STRING</td>
+                        <td><code>'UPDDATTIM_0'</code></td>
+                        <td>Columna de data/timestamp a l'origen usada per al filtre incremental. Ha d'actualitzar-se
+                            sempre que el registre canvia (típicament la columna d'última modificació del sistema
+                            origen).</td>
+                    </tr>
+                    <tr>
+                        <td><code>SOURCE_DATECOL_FORMAT</code></td>
+                        <td>STRING</td>
+                        <td><code>'%Y-%m-%d %H:%M:%S'</code></td>
+                        <td>Format Python (<code>strftime</code>) per representar la data del filtre al SQL. Per defecte
+                            <code>'%Y-%m-%d %H:%M:%S'</code>. Ajustar si la font espera un format diferent (ex: Sage amb
+                            <code>TO_TIMESTAMP</code> de Oracle).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>WINDOW_DAYS</code></td>
+                        <td>INTEGER</td>
+                        <td><code>2</code></td>
+                        <td>Dies de solapament aplicats al watermark per seguretat. Si el watermark és <em>15 gen</em> i
+                            <code>WINDOW_DAYS=2</code>, el filtre busca a partir del <em>13 gen</em>. Evita buits per
+                            problemes de rellotge. <code>0</code> = sense solapament.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>PK_COLUMNS</code></td>
+                        <td>STRING (JSON)</td>
+                        <td><code>'["NUM_0","CPY_0"]'</code></td>
+                        <td>Array JSON amb les columnes que formen la clau primària a l'origen. El Notebook usa
+                            <code>cfg.pk_columns</code> per construir la condició del MERGE. <strong>Ha d'estar en
+                                format JSON vàlid amb cometes dobles.</strong>
+                        </td>
+                    </tr>
+                    <tr class="group-header">
+                        <td colspan="4">&#9881;&#65039; D &mdash; CONTROL D'EXECUCIÓ</td>
+                    </tr>
+                    <tr>
+                        <td><code>ACTIVE</code></td>
+                        <td>BOOLEAN</td>
+                        <td><code>true</code></td>
+                        <td>Activa o desactiva la taula del cicle de càrrega. <code>false</code> = ignorada per
+                            <code>.active_only()</code> i <code>.runnable()</code>. Per apagar taules permanentment
+                            sense esborrar-les de la WT.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>LOAD_MODE</code></td>
+                        <td>STRING</td>
+                        <td><code>'INCREMENTAL'</code></td>
+                        <td><strong>Mode permanent per defecte.</strong> <code>INCREMENTAL</code> = només novetats;
+                            <code>FULL_RELOAD</code> = tot cada cop (dimensions); <code>SKIP</code> = mai executar
+                            (desactivació funcional).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>NEXT_RUN_MODE</code></td>
+                        <td>STRING / NULL</td>
+                        <td><code>'FULL_RELOAD'</code></td>
+                        <td><strong>Override puntual per a la propera execució.</strong> Sobreescriu
+                            <code>LOAD_MODE</code> una sola vegada. La sessió el posa a <code>NULL</code> automàticament
+                            si l'execució acaba bé. Usat per <code>admin.force_full_reload()</code> i
+                            <code>admin.skip_next_run()</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_ORDER</code></td>
+                        <td>INTEGER</td>
+                        <td><code>1</code></td>
+                        <td>Prioritat d'execució dins del Pipeline. Les taules amb <code>RUN_ORDER</code> menor
+                            s'executen primer quan s'usa <code>.ordered()</code>. Útil per garantir que les dimensions
+                            s'executen abans que els fets.</td>
+                    </tr>
+                    <tr class="group-header">
+                        <td colspan="4">&#128202; E &mdash; ESTAT I AUDITORIA (escrites automàticament per la llibreria)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>WATERMARK_LAST_VALUE</code></td>
+                        <td>TIMESTAMP</td>
+                        <td><code>2025-01-16 08:15:00</code></td>
+                        <td>Data/hora del registre més recent processat en l'última execució exitosa. El proper cicle
+                            incremental filtra per registres posteriors a aquest valor (menys <code>WINDOW_DAYS</code>).
+                            <strong>Si és NULL</strong> &rarr; el sistema forçarà un FULL_RELOAD automàticament.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>LAST_RUN_AT</code></td>
+                        <td>TIMESTAMP</td>
+                        <td><code>2025-01-16 08:17:42</code></td>
+                        <td>Data i hora exacta en que va acabar l'última execució (exitosa o fallida). Útil per detectar
+                            taules desactualitzades amb <code>admin.stale()</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>LAST_RUN_OK</code></td>
+                        <td>BOOLEAN</td>
+                        <td><code>true</code></td>
+                        <td><code>true</code> si l'última execució va finalitzar sense errors, <code>false</code> si va
+                            fallar. Combinada amb <code>LAST_ERROR</code> permet veure l'estat de salut del sistema d'un
+                            cop d'ull.</td>
+                    </tr>
+                    <tr>
+                        <td><code>LAST_ERROR</code></td>
+                        <td>STRING</td>
+                        <td><code>NULL</code></td>
+                        <td>Missatge d'error (màxim 500 caràcters) de l'última execució fallida. <code>NULL</code> quan
+                            <code>LAST_RUN_OK = true</code>. La sessió el neteja automàticament en la propera execució
+                            exitosa.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>CREATED_AT</code></td>
+                        <td>TIMESTAMP</td>
+                        <td><code>2024-11-01 09:00:00</code></td>
+                        <td>Data/hora de creació de la fila. S'estableix una sola vegada durant la inserció via
+                            <code>NB_Init_Watermark_Table</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>UPDATED_AT</code></td>
+                        <td>TIMESTAMP</td>
+                        <td><code>2025-01-16 08:17:42</code></td>
+                        <td>Data/hora de l'última modificació, ja sigui per una execució del Pipeline o per una operació
+                            manual via <code>WatermarkAdmin</code>. Permet auditar canvis.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3 class="sub">&#9654; Lògica de prioritat del mode efectiu</h3>
+        <div class="priority-box">
+            <div class="priority-step">
+                <div class="priority-num">1</div>
+                <p><strong>Si <code>NEXT_RUN_MODE</code> té valor</strong>
+                    <span>S'aplica el valor de <code>NEXT_RUN_MODE</code> (override puntual). Netejat automàticament per
+                        la sessió si l'execució acaba bé.</span>
+                </p>
+            </div>
+            <div class="priority-step">
+                <div class="priority-num">2</div>
+                <p><strong>Si <code>WATERMARK_LAST_VALUE</code> és NULL</strong>
+                    <span>S'aplica <code>FULL_RELOAD</code> automàticament, independentment del <code>LOAD_MODE</code>.
+                        Primera càrrega ever.</span>
+                </p>
+            </div>
+            <div class="priority-step">
+                <div class="priority-num">3</div>
+                <p><strong>En cas contrari</strong>
+                    <span>S'aplica el <code>LOAD_MODE</code> permanent de la taula.</span>
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- ARQUITECTURA -->
+    <section id="arquitectura">
+        <h2 class="section-title">Arquitectura del Sistema</h2>
+        <p class="subtitle">Dos nivells de Pipelines i un sistema de Notebooks, tots coordinats per la
+            Watermark_Control.</p>
+        <div class="arch-flow">
+            <div class="arch-row">
+                <div class="arch-step">&#9200;</div>
+                <div class="arch-content">
+                    <strong>Horari programat</strong>
+                    <p>Activa el Pipeline Mestre (<code>PL_Programador_WT_&lt;Origen&gt;</code>) de forma automatitzada.
+                    </p>
+                </div>
+            </div>
+            <div class="arch-connector"></div>
+            <div class="arch-row">
+                <div class="arch-step">1</div>
+                <div class="arch-content">
+                    <strong>Notebook de Queries (<code>NB_Querys_&lt;Origen&gt;</code>)</strong>
+                    <p>Llegeix la <code>Watermark_Control</code> amb <code>WatermarkQuery</code>. Per cada taula
+                        executable, crida <code>cfg.build_source_query()</code> que retorna el SQL complet (amb filtre
+                        de dates ja inclòs si és incremental). Genera un JSON i el retorna al Pipeline.</p>
+                </div>
+            </div>
+            <div class="arch-connector"></div>
+            <div class="arch-row">
+                <div class="arch-step">2</div>
+                <div class="arch-content">
+                    <strong>Pipeline d'Extracció &mdash; ForEach + Copy Data
+                        (<code>PL_&lt;Origen&gt;_WT</code>)</strong>
+                    <p>Itera el JSON. Per a cada taula, una activitat <strong>Copy Data</strong> executa el SQL
+                        directament contra l'origen (via ODBC/Linked Service) i guarda el resultat com a
+                        <code>.parquet</code> a la ruta <code>BRONZE_PATH</code> del Lakehouse. El Copy Data no sap si
+                        és incremental: tota la intel·ligència és al SQL del pas anterior.
+                    </p>
+                </div>
+            </div>
+            <div class="arch-connector"></div>
+            <div class="arch-row">
+                <div class="arch-step">3</div>
+                <div class="arch-content">
+                    <strong>Notebook de Transformació (<code>NB_Bronce_a_Plata_&lt;Origen&gt;</code>)</strong>
+                    <p>Quan l'extracció acaba, el Pipeline Mestre activa aquest Notebook. Per a cada taula: obre una
+                        <code>watermark_session</code>, llegeix el <code>.parquet</code> de Bronze, aplica el
+                        FULL_RELOAD o el MERGE incremental a la taula Delta de Plata, calcula el màxim de la columna de
+                        data i crida <code>cfg.set_new_watermark(max_date)</code>. En sortir del <code>with</code>, la
+                        sessió actualitza la WT en un sol MERGE atòmic.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="grid-3">
+            <div class="callout success">
+                <strong>&#10003; Un sol MERGE al final</strong>
+                La sessió agrupa tota l'actualització de la WT en un sol MERGE Delta atòmic. No hi ha escriptures
+                parcials.
+            </div>
+            <div class="callout warning">
+                <strong>&#9888; Lakehouse per defecte</strong>
+                Qualsevol Notebook que usi <code>bfg_watermark</code> ha de tenir <code>LH_BRONCE_PLATA</code> com a
+                Lakehouse per defecte, o cridar <code>spark.catalog.setCurrentDatabase("LH_BRONCE_PLATA")</code>.
+            </div>
+            <div class="callout">
+                <strong>&#128274; Transaccionalitat garantida</strong>
+                Si el codi falla, el watermark NO avança. L'error queda guardat a <code>LAST_ERROR</code> i la propera
+                execució pot reintentar des del mateix punt.
+            </div>
+        </div>
+    </section>
+
+    <!-- OPERACIONS -->
+    <section id="operacions">
+        <h2 class="section-title">Guia d'Operacions del Dia a Dia</h2>
+        <p class="subtitle">Com gestionar el sistema en les situacions habituals.</p>
+
+        <div class="ops-card">
+            <h3>&#128196; Afegir una taula nova</h3>
+            <ol>
+                <li>Obre el notebook <code>NB_Init_Watermark_Table</code>. Localitza el bloc de l'origen corresponent.
+                </li>
+                <li>Afegeix el nom de la taula i les seves claus primàries a la llista de tuples.</li>
+                <li>Afegeix la query SQL al diccionari de queries.</li>
+                <li>Executa el notebook sencer. Fa un MERGE: insereix la taula si no existeix, o actualitza la query si
+                    ja hi era.</li>
+                <li><b>Si la taula és petita:</b> no cal fer res més. El proper cicle del Pipeline la trobarà amb
+                    <code>WATERMARK_LAST_VALUE = NULL</code>, farà un FULL_RELOAD automàtic i guardarà el watermark.
+                </li>
+                <li><b>Si la taula és gran (historial massiu):</b> consulta la secció d'Escenaris Especials.</li>
+            </ol>
+        </div>
+
+        <div class="ops-card green">
+            <h3>&#128260; Forçar la recàrrega completa d'una taula</h3>
+            <ul>
+                <li><b>Quan usar-ho:</b> has canviat l'esquema de la taula Silver, o sospites inconsistències entre
+                    Bronze i Plata.</li>
+                <li>Des d'un notebook interactiu: <code>admin.force_full_reload(source="SAGE", table="PORDER")</code>
+                </li>
+                <li>Posa <code>NEXT_RUN_MODE = 'FULL_RELOAD'</code>. La propera execució del Pipeline carregarà tota la
+                    taula des de zero i netejarà l'override automàticament.</li>
+            </ul>
+        </div>
+
+        <div class="ops-card amber">
+            <h3>&#9888;&#65039; Bloquejar temporalment una taula problemàtica</h3>
+            <ul>
+                <li><b>Cas d'ús:</b> l'origen d'una taula concreta té problemes i vols que el Pipeline continuï amb la
+                    resta.</li>
+                <li>Marcar com a SKIP: <code>admin.skip_next_run(source="SAGE", table="SINVOICE")</code></li>
+                <li>Tornar a activar quan l'origen estigui reparat:
+                    <code>admin.resume_from_skip(source="SAGE", table="SINVOICE")</code>
+                </li>
+                <li>Per desactivar tota una àrea indefinidament:
+                    <code>admin.deactivate(source="SAGE", area="COMPRES")</code>
+                </li>
+            </ul>
+        </div>
+
+        <div class="ops-card purple">
+            <h3>&#128296; Modificar i empaquetar la llibreria</h3>
+            <ol>
+                <li>Modifica el codi Python de <code>bfg_watermark</code> localment.</li>
+                <li>Executa al terminal: <code>python setup.py bdist_wheel</code>. Es crea el fitxer <code>.whl</code> a
+                    la carpeta <code>dist/</code>.</li>
+                <li>A Fabric: ves a <b>Environments</b> &rarr; obre el teu <code>DEFAULT_ENV</code>.</li>
+                <li>Ves a la pestanya <b>Custom Libraries</b>, puja el nou <code>.whl</code> substituint l'anterior, i
+                    fes <b>Publish</b>. Tots els Notebooks prendran la nova versió.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- ESCENARIS -->
+    <section id="escenaris">
+        <h2 class="section-title">Escenaris Especials</h2>
+        <p class="subtitle">Com actuar en situacions fora del flux habitual.</p>
+
+        <div class="ops-card" style="border-left-color:var(--danger);">
+            <h3>&#128230; A. Càrrega inicial massiva (historial gran)</h3>
+            <p>Una taula nova té 30+ milions de registres. Executar el Pipeline sencer faria que el <em>Copy Data</em>
+                consumís masses CUs i potser fallés per timeout.</p>
+            <ol>
+                <li><b>Extracció manual:</b> des del teu ordinador (DBeaver, SSMS, etc.), exporta totes les dades a un
+                    fitxer <code>.parquet</code>.</li>
+                <li><b>Puja a Bronze:</b> ves a l'explorador de fitxers de MS Fabric i puja el <code>.parquet</code>
+                    exactament a la ruta <code>BRONZE_PATH</code> que figura a la WT per aquesta taula.</li>
+                <li><b>Verifica el mode:</b> assegura't que <code>NEXT_RUN_MODE = 'FULL_RELOAD'</code> o que
+                    <code>WATERMARK_LAST_VALUE</code> sigui <code>NULL</code>:
+                    <code>admin.force_full_reload(source="SAGE", table="PORDER")</code>
+                </li>
+                <li><b>Executa NOMÉS el Notebook de transformació:</b> ves al notebook
+                    <code>NB_Bronce_a_Plata_&lt;Origen&gt;</code> i executa'l de forma aïllada des de MS Fabric (no el
+                    Pipeline sencer). El Notebook detectarà el FULL_RELOAD, llegirà el teu enorme <code>.parquet</code>
+                    i l'introduirà a Plata. En acabar bé, la sessió netejarà l'override i avançarà el watermark. La
+                    propera nit, el Pipeline correrà en mode INCREMENTAL amb normalitat.
+                </li>
+            </ol>
+        </div>
+
+        <div class="ops-card amber">
+            <h3>&#9193;&#65039; B. Executar només algunes taules (SKIP selectiu)</h3>
+            <p>Per incidència puntual, vols executar el Pipeline però ometre taules concretes.</p>
+            <ul>
+                <li>Marcar les taules a saltar: <code>admin.skip_next_run(source="SAGE", table="SINVOICE")</code></li>
+                <li>Executa el Pipeline normalment: processarà totes les taules EXCEPTE les marcades.</li>
+                <li>L'endemà, les taules tornaran al mode INCREMENTAL automàticament.</li>
+            </ul>
+        </div>
+
+        <div class="ops-card purple">
+            <h3>&#9194;&#65039; C. Recuperar la WT d'un estat corromput (Delta Time Travel)</h3>
+            <p>Algú ha modificat la <code>Watermark_Control</code> per error.</p>
+            <ul>
+                <li>Veure l'historial de versions: <code>display(admin.show_history())</code></li>
+                <li>Inspeccionar l'estat en la versió 5 sense modificar-la:
+                    <code>display(admin.inspect_table(version=5))</code>
+                </li>
+                <li>Si sembla correcta, restaurar-la (acció destructiva): <code>admin.recover_table(version=5)</code>
+                </li>
+                <li>O per timestamp: <code>admin.recover_table(timestamp="2025-01-15 08:00:00")</code></li>
+            </ul>
+        </div>
+
+        <div class="callout warning" style="margin-top:1.5rem;">
+            <strong>&#128274; Recordatori: Lakehouse per defecte</strong>
+            Qualsevol Notebook que usi <code>bfg_watermark</code> ha de tenir <code>LH_BRONCE_PLATA</code> com a
+            Lakehouse per defecte.
+            Si el teu Notebook necessita un altre Lakehouse, afegeix al principi:
+            <code>spark.catalog.setCurrentDatabase("LH_BRONCE_PLATA")</code>
+        </div>
+    </section>
+
+    <!-- API -->
+    <section id="api">
+        <h2 class="section-title">Referència de l'API</h2>
+        <p class="subtitle"><code>import bfg_watermark as wm</code> &mdash; 4 components principals.</p>
+
+        <h3 class="sub">A. <code>WatermarkQuery</code> &mdash; Consulta Fluent</h3>
+        <p style="color:var(--muted);margin-bottom:1.2rem;">Builder fluent per consultar la
+            <code>Watermark_Control</code>. S'encadenen filtres i es finalitza amb <code>.build()</code> o
+            <code>.one()</code>.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mètode</th>
+                        <th>Exemple</th>
+                        <th>Descripció</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3" class="td-muted">Filtres (encadenables)</td>
+                    </tr>
+                    <tr>
+                        <td><code>.source(*sources)</code></td>
+                        <td><code>.source("SAGE")</code></td>
+                        <td>Filtra per sistema d'origen. Múltiples valors fan OR.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.area(*areas)</code></td>
+                        <td><code>.area("COMPRES")</code></td>
+                        <td>Filtra per àrea de negoci. Múltiples valors fan OR.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.table(*tables)</code></td>
+                        <td><code>.table("PORDER","SORDER")</code></td>
+                        <td>Filtra per nom de taula. Múltiples valors fan OR.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.dimension(bool)</code></td>
+                        <td><code>.dimension(True)</code></td>
+                        <td>Filtra per el flag <code>IS_DIMENSION</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.active_only()</code></td>
+                        <td><code>.active_only()</code></td>
+                        <td>Exclou files amb <code>ACTIVE = false</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.runnable()</code></td>
+                        <td><code>.runnable()</code></td>
+                        <td><strong>Recomanat per Pipelines.</strong> Aplica <code>active_only()</code> i exclou taules
+                            on <code>effective_mode = SKIP</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.mode(*modes)</code></td>
+                        <td><code>.mode("INCREMENTAL")</code></td>
+                        <td>Filtra pel <code>LOAD_MODE</code> permanent.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.ordered()</code></td>
+                        <td><code>.ordered()</code></td>
+                        <td>Ordena per <code>SOURCE</code>, <code>RUN_ORDER</code>, <code>TABLE_NAME</code>.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="td-muted">Terminals (executen la consulta)</td>
+                    </tr>
+                    <tr>
+                        <td><code>.build()</code></td>
+                        <td>&rarr; <code>list[WatermarkConfig]</code></td>
+                        <td>Executa i retorna una llista. Pot ser buida.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.one()</code></td>
+                        <td>&rarr; <code>WatermarkConfig</code></td>
+                        <td>Executa i retorna exactament un resultat. Llança <code>ValueError</code> si n'hi ha 0 o més
+                            d'1.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="sub">B. <code>WatermarkConfig</code> &mdash; Configuració d'una Taula</h3>
+        <p style="color:var(--muted);margin-bottom:1.2rem;">Encapsula una fila de la WT i calcula automàticament
+            l'estratègia. S'obté via <code>WatermarkQuery</code>, mai s'instancia directament.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Propietat / Mètode</th>
+                        <th>Tipus</th>
+                        <th>Descripció</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3" class="td-muted">Identitat i enrutament</td>
+                    </tr>
+                    <tr>
+                        <td><code>.source</code></td>
+                        <td>str</td>
+                        <td>Valor de la columna <code>SOURCE</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.table_name</code></td>
+                        <td>str</td>
+                        <td>Valor de la columna <code>TABLE_NAME</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.area</code></td>
+                        <td>str</td>
+                        <td>Valor de la columna <code>AREA</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.is_dimension</code></td>
+                        <td>bool</td>
+                        <td>Valor de la columna <code>IS_DIMENSION</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.silver_table</code></td>
+                        <td>str</td>
+                        <td>Nom de la taula Delta de destí a Plata. Usar amb
+                            <code>DeltaTable.forName(spark, cfg.silver_table)</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>.bronze_path</code></td>
+                        <td>str</td>
+                        <td>Ruta del <code>.parquet</code> a Bronze. Usar amb
+                            <code>spark.read.parquet(cfg.bronze_path)</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>.pk_columns</code></td>
+                        <td>list[str]</td>
+                        <td>Llista de columnes PK (deserialitzada del JSON). Usar per construir condicions de MERGE.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>.source_datecol</code></td>
+                        <td>str</td>
+                        <td>Nom de la columna de data a l'origen.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.source_datecol_format</code></td>
+                        <td>str</td>
+                        <td>Format de data per al filtre SQL.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.window_days</code></td>
+                        <td>int</td>
+                        <td>Dies de solapament aplicats al watermark.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="td-muted">Control i estat</td>
+                    </tr>
+                    <tr>
+                        <td><code>.active</code></td>
+                        <td>bool</td>
+                        <td>Si la taula és activa a la WT.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.load_mode</code></td>
+                        <td>str</td>
+                        <td>Mode permanent (<code>LOAD_MODE</code>). Usar <code>.effective_mode</code> en el codi, no
+                            aquest.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.next_run_mode</code></td>
+                        <td>str|None</td>
+                        <td>Override puntual (<code>NEXT_RUN_MODE</code>). <code>None</code> si no n'hi ha.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.watermark_last</code></td>
+                        <td>datetime|None</td>
+                        <td>Últim watermark guardat. <code>None</code> si és la primera càrrega.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.last_run_at</code></td>
+                        <td>datetime|None</td>
+                        <td>Timestamp de l'última execució.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.last_run_ok</code></td>
+                        <td>bool|None</td>
+                        <td>Si l'última execució va ser exitosa.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.last_error</code></td>
+                        <td>str|None</td>
+                        <td>Missatge de l'últim error.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="td-muted">Propietats calculades &mdash; usar SEMPRE aquestes en el codi,
+                            no llegir les columnes crues</td>
+                    </tr>
+                    <tr>
+                        <td><code>.effective_mode</code></td>
+                        <td>str</td>
+                        <td><strong>El mode real per a AQUESTA execució</strong>, seguint la prioritat:
+                            <code>NEXT_RUN_MODE</code> &gt; (NULL watermark &rarr; <code>FULL_RELOAD</code>) &gt;
+                            <code>LOAD_MODE</code>. Sempre usar aquest, mai <code>load_mode</code> directament.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>.from_date</code></td>
+                        <td>datetime|None</td>
+                        <td>Data de tall calculada (watermark &minus; window_days). <code>None</code> si s'ha de fer
+                            FULL_RELOAD. Usar com a límit inferior en queries manuals.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.should_run</code></td>
+                        <td>bool</td>
+                        <td><code>False</code> si <code>effective_mode == 'SKIP'</code>. Per sortir ràpidament d'un
+                            notebook.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.is_first_run</code></td>
+                        <td>bool</td>
+                        <td><code>True</code> si <code>WATERMARK_LAST_VALUE</code> és <code>NULL</code>. Primera càrrega
+                            de la taula.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="td-muted">Mètodes d'acció</td>
+                    </tr>
+                    <tr>
+                        <td><code>.build_source_query()</code></td>
+                        <td>str|None</td>
+                        <td>Retorna el SQL complet amb el filtre de dates i una clàusula <code>EXISTS</code> ja afegits
+                            si és incremental, permetent a la base de dades retornar 0 registres instantàniament si no
+                            hi ha novetats. <code>None</code>
+                            si <code>SOURCE_QUERY</code> no està configurat a la WT.</td>
+                    </tr>
+                    <tr>
+                        <td><code>.set_new_watermark(val)</code></td>
+                        <td>&mdash;</td>
+                        <td>Sobreescriu el valor que es guardarà com a nou watermark quan la sessió finalitzi. Si no es
+                            crida, la sessió guarda <code>datetime.now()</code> per defecte.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="sub">C. <code>watermark_session</code> &mdash; Context Manager Transaccional</h3>
+        <p style="color:var(--muted);margin-bottom:1.5rem;">La peça clau del sistema. Gestiona el cicle complet i
+            actualitza la WT en un sol MERGE atòmic al final.</p>
+        <div class="guarantee-grid">
+            <div class="g-card" style="border-color:var(--secondary);">
+                <div class="icon">&#10003;&#65039;</div>
+                <h4>Èxit</h4>
+                <p>Avança <code>WATERMARK_LAST_VALUE</code>, posa <code>LAST_RUN_OK = true</code>, neteja
+                    <code>LAST_ERROR</code>, neteja <code>NEXT_RUN_MODE</code> si era un override.
+                </p>
+            </div>
+            <div class="g-card" style="border-color:var(--danger);">
+                <div class="icon">&#10060;</div>
+                <h4>Error</h4>
+                <p>Manté <code>WATERMARK_LAST_VALUE</code> intacte (no avança), posa <code>LAST_RUN_OK = false</code>,
+                    guarda el missatge d'error a <code>LAST_ERROR</code>. Relança l'excepció.</p>
+            </div>
+            <div class="g-card" style="border-color:var(--accent);">
+                <div class="icon">&#9193;&#65039;</div>
+                <h4>Mode SKIP</h4>
+                <p>Fa un <code>yield</code> del <code>cfg</code> i surt immediatament sense escriure
+                    <strong>res</strong> a la WT.
+                </p>
+            </div>
+        </div>
+
+        <h3 class="sub">D. <code>WatermarkAdmin</code> &mdash; Operacions d'Administració</h3>
+        <p style="color:var(--muted);margin-bottom:1.2rem;">Modifica l'estat de la WT des de notebooks interactius. Tots
+            els mètodes accepten filtres per <code>source</code>, <code>area</code> i/o <code>table</code>. Posa
+            <code>UPDATED_AT</code> automàticament.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mètode</th>
+                        <th>Descripció</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="2" class="td-muted">Activació / Desactivació</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.activate(source=,area=,table=)</code></td>
+                        <td>Posa <code>ACTIVE = true</code> per les taules que coincideixin.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.deactivate(source=,area=,table=)</code></td>
+                        <td>Posa <code>ACTIVE = false</code>. Les taules desactivades s'ignoren en
+                            <code>.runnable()</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="td-muted">Mode permanent</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.set_mode(mode, source=,...)</code></td>
+                        <td>Canvia el <code>LOAD_MODE</code> permanent. <code>mode</code> ha de ser
+                            <code>'INCREMENTAL'</code>, <code>'FULL_RELOAD'</code> o <code>'SKIP'</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="td-muted">Overrides puntuals</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.force_full_reload(...)</code></td>
+                        <td>Posa <code>NEXT_RUN_MODE = 'FULL_RELOAD'</code>. Netejat automàticament per la sessió
+                            després de l'execució exitosa.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.skip_next_run(...)</code></td>
+                        <td>Posa <code>NEXT_RUN_MODE = 'SKIP'</code>. La propera execució s'obviarà completament.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.resume_from_skip(...)</code></td>
+                        <td>Neteja <code>NEXT_RUN_MODE = 'SKIP'</code> i/o <code>LOAD_MODE = 'SKIP'</code>, tornant la
+                            taula a <code>INCREMENTAL</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.reset_watermark(...)</code></td>
+                        <td>Posa <code>WATERMARK_LAST_VALUE = NULL</code>. La propera execució forçarà un
+                            <code>FULL_RELOAD</code> automàtic.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="td-muted">Diagnòstic</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.status()</code></td>
+                        <td>DataFrame complet: mode, estat, watermark, última execució. Vista global del sistema.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.errors()</code></td>
+                        <td>Taules actives amb <code>LAST_RUN_OK = false</code>. Primera opció davant d'un error.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.stale(hours=25)</code></td>
+                        <td>Taules sense execució exitosa en les últimes <code>hours</code> hores. Detecta taules
+                            estancades.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="td-muted">Delta Time Travel</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.show_history(limit=20)</code></td>
+                        <td>Historial de versions Delta de <code>Watermark_Control</code>. Per identificar quan estava
+                            en bon estat.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.inspect_table(version=,timestamp=)</code></td>
+                        <td>Llegeix la WT tal com era en una versió/timestamp concret, <strong>sense
+                                modificar-la</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin.recover_table(version=,timestamp=)</code></td>
+                        <td><strong>Acció destructiva:</strong> restaura la WT sencera a un estat anterior. Usar amb
+                            precaució.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <!-- CODI -->
+    <section id="codi">
+        <h2 class="section-title">Patrons de Codi</h2>
+        <p class="subtitle">Exemples complets i comentats per als casos d'ús habituals.</p>
+
+        <h3 class="sub">Patró complet: Notebook Bronze &rarr; Plata</h3>
+        <pre><code><span class="keyword">import</span> bfg_watermark <span class="keyword">as</span> wm
+<span class="keyword">from</span> delta.tables <span class="keyword">import</span> DeltaTable
+<span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> max <span class="keyword">as</span> _max
+
+<span class="keyword">def</span> <span class="function">processar_taula</span>(cfg: wm.WatermarkConfig):
+    <span class="string">"""Processa una sola taula: Bronze → Plata amb gestió de watermark."""</span>
+    <span class="keyword">with</span> wm.<span class="function">watermark_session</span>(spark, config=cfg) <span class="keyword">as</span> cfg:
+        <span class="comment"># Llegir de Bronze</span>
+        df_bronze = spark.read.format(<span class="string">"parquet"</span>).load(cfg.bronze_path)
+
+        <span class="keyword">if</span> cfg.effective_mode == wm.MODE_FULL_RELOAD:
+            <span class="comment"># Sobreescriure tota la taula de Plata</span>
+            (df_bronze.write
+                .format(<span class="string">"delta"</span>)
+                .mode(<span class="string">"overwrite"</span>)
+                .option(<span class="string">"overwriteSchema"</span>, <span class="string">"true"</span>)
+                .saveAsTable(cfg.silver_table))
+
+        <span class="keyword">elif</span> cfg.effective_mode == wm.MODE_INCREMENTAL:
+            <span class="comment"># MERGE incremental contra la taula Delta de Plata</span>
+            delta_table = DeltaTable.<span class="function">forName</span>(spark, cfg.silver_table)
+            merge_cond = <span class="string">" AND "</span>.join([<span class="string">f"target.{k} = source.{k}"</span> <span class="keyword">for</span> k <span class="keyword">in</span> cfg.pk_columns])
+
+            (delta_table.alias(<span class="string">"target"</span>)
+                .merge(df_bronze.alias(<span class="string">"source"</span>), merge_cond)
+                .<span class="function">whenMatchedUpdateAll</span>()
+                .<span class="function">whenNotMatchedInsertAll</span>()
+                .<span class="function">execute</span>())
+
+        <span class="comment"># Avançar el watermark al valor màxim trobat a Bronze</span>
+        <span class="keyword">if</span> cfg.source_datecol:
+            max_date = df_bronze.agg(<span class="function">_max</span>(cfg.source_datecol)).collect()[0][0]
+            <span class="keyword">if</span> max_date:
+                cfg.<span class="function">set_new_watermark</span>(max_date)
+
+
+<span class="comment"># Obtenir totes les taules de SAGE executables i processar-les</span>
+configs = wm.<span class="function">WatermarkQuery</span>(spark).source(<span class="string">"SAGE"</span>).runnable().ordered().build()
+<span class="keyword">for</span> cfg <span class="keyword">in</span> configs:
+    <span class="function">processar_taula</span>(cfg)</code></pre>
+
+        <h3 class="sub">Patró: Notebook de Queries (genera JSON per al Pipeline)</h3>
+        <pre><code><span class="keyword">import</span> bfg_watermark <span class="keyword">as</span> wm
+<span class="keyword">import</span> json
+
+configs = wm.<span class="function">WatermarkQuery</span>(spark).source(<span class="string">"SAGE"</span>).runnable().ordered().build()
+
+output = [
+    {
+        <span class="string">"table"</span>:       cfg.table_name,
+        <span class="string">"query"</span>:       cfg.<span class="function">build_source_query</span>(),
+        <span class="string">"bronze_path"</span>: cfg.bronze_path
+    }
+    <span class="keyword">for</span> cfg <span class="keyword">in</span> configs
+    <span class="keyword">if</span> cfg.<span class="function">build_source_query</span>() <span class="keyword">is not</span> None
+]
+
+mssparkutils.notebook.<span class="function">exit</span>(json.<span class="function">dumps</span>(output))</code></pre>
+
+        <h3 class="sub">Patró: Diagnòstic ràpid</h3>
+        <pre><code><span class="keyword">from</span> bfg_watermark <span class="keyword">import</span> WatermarkAdmin
+admin = <span class="function">WatermarkAdmin</span>(spark)
+
+<span class="comment"># Estat global de totes les taules</span>
+display(admin.<span class="function">status</span>())
+
+<span class="comment"># Taules que han fallat</span>
+display(admin.<span class="function">errors</span>())
+
+<span class="comment"># Taules no actualitzades en les últimes 26 hores</span>
+display(admin.<span class="function">stale</span>(hours=26))</code></pre>
+    </section>
+
+
+
+    <footer>
+        <p>bfg_watermark v1.0.0 &mdash; Balfeg&oacute; &amp; Balfeg&oacute; S.L. &mdash; MS Fabric Data Engineering</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                if (scrollY >= section.offsetTop - 200) { current = section.getAttribute('id'); }
+            });
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').substring(1) === current) { a.classList.add('active'); }
+            });
+        });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+        }, { threshold: 0.05 });
+        document.querySelectorAll('section').forEach(section => { observer.observe(section); });
+    </script>
+</body>
+
+</html>

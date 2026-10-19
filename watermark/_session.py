@@ -1,4 +1,15 @@
-﻿from contextlib import contextmanager
+﻿# watermark/_session.py
+# ─────────────────────────────────────────────────────────────
+# watermark_session: context manager for the full
+#   get config → process → update watermark cycle.
+#
+# On clean exit:  updates WATERMARK_LAST_VALUE + clears NEXT_RUN_MODE
+#                 in a SINGLE Delta transaction (one MERGE).
+# On exception:   records error in LAST_ERROR, re-raises.
+# SKIP mode:      yields cfg with should_run=False, no watermark written.
+# ─────────────────────────────────────────────────────────────
+
+from contextlib import contextmanager
 from datetime import datetime
 
 from . import _constants as c

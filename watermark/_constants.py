@@ -1,4 +1,9 @@
-﻿TABLE_NAME = "Watermark_Control"
+﻿# watermark/_constants.py
+# ─────────────────────────────────────────────────────────────
+# Central constants for the watermark library.
+# ─────────────────────────────────────────────────────────────
+
+TABLE_NAME = "Watermark_Control"
 
 # ── Load Modes ──
 MODE_INCREMENTAL = "INCREMENTAL"
